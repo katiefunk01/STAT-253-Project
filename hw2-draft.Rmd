@@ -69,10 +69,35 @@ bidenelection <- read_csv("trump_biden_polls.csv")
 clintonelection <- read_csv("trump_clinton_polls.csv")
 countystatistics <- read_csv("county_statistics.csv")
 
+county_clean <- read_csv("county_statistics.csv", 
+    col_types = cols(...1 = col_skip(), votes16_Donald_Trump = col_skip(), 
+        votes16_Hillary_Clinton = col_skip(), 
+        votes20_Donald_Trump = col_skip(), 
+        votes20_Joe_Biden = col_skip(), Hispanic = col_skip(), 
+        White = col_skip(), Black = col_skip(), 
+        Native = col_skip(), Asian = col_skip(), 
+        Pacific = col_skip(), Income = col_skip(), 
+        IncomeErr = col_skip(), IncomePerCapErr = col_skip(), 
+        ChildPoverty = col_skip(), Drive = col_skip(), 
+        Carpool = col_skip(), Transit = col_skip(), 
+        Walk = col_skip(), OtherTransp = col_skip(), 
+        WorkAtHome = col_skip(), MeanCommute = col_skip(), 
+        Employed = col_skip(), PrivateWork = col_skip(), 
+        PublicWork = col_skip(), SelfEmployed = col_skip(), 
+        FamilyWork = col_skip()))
+View(county_clean)
+
+
+county_cleaner <- county_clean %>%
+    mutate(clinton16_Win = ifelse(percentage16_Donald_Trump < percentage16_Hillary_Clinton, 1, 0)) %>%
+    mutate(trump16_Win = ifelse(percentage16_Donald_Trump > percentage16_Hillary_Clinton, 1, 0)) %>%
+    mutate(trump20_Win = ifelse(percentage20_Donald_Trump > percentage20_Joe_Biden, 1, 0)) %>%
+    mutate(biden20_Win = ifelse(percentage20_Donald_Trump < percentage20_Joe_Biden, 1, 0)) %>%
+    mutate(deathRate = 100*deaths/cases)
 ```
 
 ```{r}
-# data cleaning
+
 
 ```
 
