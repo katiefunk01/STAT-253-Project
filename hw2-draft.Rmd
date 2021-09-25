@@ -72,7 +72,7 @@ countystatistics <- read_csv("county_statistics.csv")
 ```
 
 ```{r}
-# data cleaning
+
 
 ```
 
