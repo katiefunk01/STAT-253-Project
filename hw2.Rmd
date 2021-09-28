@@ -64,11 +64,10 @@ library(dplyr)
 library(tidymodels)
 tidymodels_prefer()
 
-electioncounty <- read_csv("president_county_candidate.csv")
+electioncounty <- read_csv("president_county_candidate.csv") 
 bidenelection <- read_csv("trump_biden_polls.csv")
 clintonelection <- read_csv("trump_clinton_polls.csv")
-countystatistics <- read_csv("county_statistics.csv")
-
+countystatistics <- read_csv("county_statistics.csv") # we like this one
 ```
 
 ```{r}
