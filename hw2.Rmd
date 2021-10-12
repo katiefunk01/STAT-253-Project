@@ -1,5 +1,5 @@
 ```{r hw2_setup, include=FALSE}
-knitr::opts_chunk$set(echo=TRUE, eval=FALSE)
+knitr::opts_chunk$set(echo=TRUE, eval=TRUE)
 ```
 
 # Homework 2 {-}
@@ -74,7 +74,7 @@ accidents <- read_csv("US_Accidents_Dec20_updated.csv")
 accident_sub <- accidents %>%
     filter(year(Start_Time) >= 2018, year(Start_Time) <= 2019) %>%
     drop_na(.) %>%
-    select(-End_Time, -Airport_Code, -Timezone, -Weather_Timestamp, -Civil_Twilight, -Nautical_Twilight,-Astronomical_Twilight, -Traffic_Calming, -`Humidity(%)`, -`Wind_Chill(F)`, -Railway,  -Bump, -Amenity, -Country, -`Pressure(in)`, -Wind_Direction, -Give_Way, -No_Exit, -Roundabout, - Station, -Stop, -Turning_Loop, - Stop, -Description, - Street) %>%
+    select(-End_Time, -Airport_Code, -Timezone, -Weather_Timestamp, -Civil_Twilight, -Nautical_Twilight,-Astronomical_Twilight, -Traffic_Calming, -`Humidity(%)`, -`Wind_Chill(F)`, -Railway,  -Bump, -Amenity, -Country, -`Pressure(in)`, -Wind_Direction, -Give_Way, -No_Exit, -Roundabout, - Station, -Stop, -Turning_Loop, - Stop, -Description, - Street, -Severity) %>%
   sample_frac(size = 1/5)
   
 ```
@@ -86,9 +86,9 @@ set.seed(253)
 accident_cv <- vfold_cv(accident_sub, v = 10) #this is the random part
 
 training(accident_cv$splits[[1]]) # pulls training data for the 1st split (1st fold is testing set)
-
 testing(accident_cv$splits[[1]]) # pulls testing data for the 1st split (1st fold is testing set)
 ```
+
 
 ```{r}
 # model spec
@@ -107,25 +107,21 @@ lm_lasso_spec <-
 
 ```{r}
 # recipes & workflows
-
 #Do we need a recipe for the first regression?
-model_wf <- workflow() %>% 
-  add_formula(`Distance(mi)` ~ .) %>%
-  step_dummy(all_nominal_predictors()) %>%
-  add_model(lm_spec)
-
-Car_rec <- recipe(`Distance(mi)` ~ ., data = accident_sub) %>%
-  step_dummy(all_nominal_predictors()) %>%
-  step_nzv(all_predictors()) %>%
-  step_normalize(all_numeric_predictors())  
-
-Car_rec %>% prep(accident_sub) %>% juice()
-
-lasso_wf_Car <- workflow() %>% 
-  add_recipe(Car_rec) %>%
-  add_model(lm_lasso_spec)
-
+model_wf <- workflow() %>%
+    add_formula(`Distance(mi)` ~ Severity + `Distance(mi)` + `Temperature(F)`) %>% # chose quantitative vars
+    step_dummy(all_nominal_predictors()) %>%
+    add_model(lm_spec)
+Car_rec <- recipe(`Distance(mi)` ~ Severity + `Distance(mi)` + `Temperature(F)`, data = accident_sub) %>%
+    step_dummy(all_nominal_predictors()) %>%
+    step_nzv(all_predictors()) %>%
+    step_normalize(all_numeric_predictors())
+# Car_rec %>% prep(accident_sub) %>% juice() # prep function incorrect
+lasso_wf_Car <- workflow() %>%
+    add_recipe(Car_rec) %>%
+    add_model(lm_lasso_spec)
 ```
+
 
 ```{r}
 # fit & tune models
